@@ -6,12 +6,12 @@ To install dependencies:
 bun install
 ```
 
-Put your inputs as `input.txt` to `src/[puzzle number]`
+Put your inputs as `input.txt` to `src/[year]/[puzzle number]`
 
 To run (first puzzle):
 
 ```bash
-bun run --watch ./src/1
+bun run --watch ./src/2024/1
 ```
 
 This project was created using `bun init` in bun v1.1.34. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
