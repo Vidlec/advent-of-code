@@ -3,43 +3,54 @@ const inputRaw = await inputFile.text()
 
 console.time("elapsed")
 
-const [freshRangeRaw, ids] = inputRaw.split("\n\n").map((row) => row.split("\n"))
-const freshRange = freshRangeRaw.map((range) => range.split("-").map(Number))
+const [rangesBlock, idsBlock] = inputRaw.trim().split("\n\n")
 
-const freshIds = ids.map(Number).filter((id) => {
-  return freshRange.some(([from, to]) => {
-    return id >= from && id <= to
-  })
-})
+const ranges = rangesBlock
+  .split("\n")
+  .map((line) => line.split("-").map(Number))
+  .sort(([a], [b]) => a - b)
 
-console.log("Part 1: ", freshIds.length)
+const merged: [number, number][] = []
+let [currentFrom, currentTo] = ranges[0]
 
-const sortedRanges = freshRange.sort(([a], [b]) => a - b)
-
-let count = 0
-
-for (let i = 0; i < sortedRanges.length; i++) {
-  const [from, to] = sortedRanges[i]
-
-  const next = sortedRanges[i + 1]
-  if (!next) {
-    count = count + (to - from) + 1
-    break
-  }
-
-  const [nextFrom, nextTo] = next
-
-  if (to >= nextFrom) {
-    sortedRanges[i + 1][0] = from
-    if (to >= nextTo) {
-      sortedRanges[i + 1][1] = to
-    }
+// * Merge ranges
+for (let i = 1; i < ranges.length; i++) {
+  const [from, to] = ranges[i]
+  if (from <= currentTo) {
+    if (to > currentTo) currentTo = to
     continue
   }
+  merged.push([currentFrom, currentTo])
+  currentFrom = from
+  currentTo = to
+}
+merged.push([currentFrom, currentTo])
 
-  count = count + (to - from) + 1
+// * Binary search
+const isInMergedRanges = (id: number) => {
+  let low = 0
+  let high = merged.length - 1
+
+  while (low <= high) {
+    const mid = (low + high) >> 1
+    const [from, to] = merged[mid]
+    if (id < from) {
+      high = mid - 1
+    } else if (id > to) {
+      low = mid + 1
+    } else {
+      return true
+    }
+  }
+  return false
 }
 
-console.log("Part 2: ", count)
+const freshIdsCount = idsBlock.trim().split("\n").map(Number).filter(isInMergedRanges).length
+
+console.log("Part 1:", freshIdsCount)
+
+const count = merged.reduce((acc, [from, to]) => acc + (to - from + 1), 0)
+
+console.log("Part 2:", count)
 
 console.timeEnd("elapsed")
