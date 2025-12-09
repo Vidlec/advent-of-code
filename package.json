@@ -8,5 +8,9 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@flatten-js/core": "^1.6.8",
+    "ts-2d-geometry": "^6.3.5"
   }
 }
